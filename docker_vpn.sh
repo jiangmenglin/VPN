@@ -7,17 +7,16 @@ CONTAINER_NAME="vpn-container"
 DEFAULT_PORT=8080
 
 print_usage() {
-    echo "Usage: $0 -p <password> [-P <port>] [-D <domain>] [-r <path>] [-g <git-url>]"
+    echo "Usage: $0 -p <password> [-P <port>] [-D <domain>] [-r <path>]"
     echo "  -p <password>   Required: VPN password"
     echo "  -P <port>       Optional: host port (default: $DEFAULT_PORT)"
     echo "  -D <domain>     Optional: domain for TLS mode (default: no)"
-    echo "  -r <path>       Optional: path to VPN project directory"
-    echo "  -g <git-url>    Optional: git clone URL (e.g. https://github.com/aditya-shri/VPN.git)"
+    echo "  -r <path>       Optional: path to VPN project directory (default: current directory via pwd)"
     echo "  -h              Show this help"
     echo ""
     echo "Examples:"
-    echo "  $0 -p mypass -r ./VPN"
-    echo "  $0 -p mypass -g https://github.com/aditya-shri/VPN.git"
+    echo "  $0 -p mypass"
+    echo "  $0 -p mypass -r /root/VPN"
     exit 1
 }
 
@@ -25,15 +24,13 @@ PORT=$DEFAULT_PORT
 DOMAIN="no"
 PASSWORD=""
 PROJECT_DIR=""
-GIT_URL=""
 
-while getopts "p:P:D:r:g:h" opt; do
+while getopts "p:P:D:r:h" opt; do
     case $opt in
         p) PASSWORD="$OPTARG" ;;
         P) PORT="$OPTARG" ;;
         D) DOMAIN="$OPTARG" ;;
         r) PROJECT_DIR="$OPTARG" ;;
-        g) GIT_URL="$OPTARG" ;;
         h) print_usage ;;
         *) print_usage ;;
     esac
@@ -44,20 +41,10 @@ if [ -z "$PASSWORD" ]; then
     print_usage
 fi
 
-cleanup() {
-    [ -n "$TMP_DIR" ] && rm -rf "$TMP_DIR"
-}
-trap cleanup EXIT
-
-if [ -n "$GIT_URL" ]; then
-    TMP_DIR=$(mktemp -d)
-    echo ">>> Cloning from $GIT_URL ..."
-    git clone "$GIT_URL" "$TMP_DIR"
-    PROJECT_DIR="$TMP_DIR"
-elif [ -z "$PROJECT_DIR" ]; then
-    PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-    echo ">>> Using current directory: $PROJECT_DIR"
+if [ -z "$PROJECT_DIR" ]; then
+    PROJECT_DIR="$(pwd)"
 fi
+echo ">>> Using project directory: $PROJECT_DIR"
 
 if [ ! -f "$PROJECT_DIR/Dockerfile" ]; then
     echo "Error: Dockerfile not found in $PROJECT_DIR"
@@ -68,11 +55,6 @@ if ! command -v docker &>/dev/null; then
     echo ">>> Docker not found, installing..."
     sudo apt update && sudo apt install -y docker.io
     sudo systemctl enable --now docker
-fi
-
-if ! command -v git &>/dev/null; then
-    echo ">>> Git not found, installing..."
-    sudo apt install -y git
 fi
 
 echo ">>> Building Docker image..."
