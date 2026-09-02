@@ -1,11 +1,11 @@
 # Personal VPN
 ### Based on Shadowsocks with V2-Raу-plugin
 
-'''
+```txt
 git clone url
 cd ./VPN
 sudo ./docker_vpn.sh -p password
-'''
+```
 
 ---
 
