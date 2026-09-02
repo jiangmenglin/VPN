@@ -1,11 +1,11 @@
 # Personal VPN
 ### Based on Shadowsocks with V2-Raу-plugin
 
-Click the button below to deploy, and remember to Star if it works:
-
-[![Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/aditya-shri/VPN)
-
-[![Railway](https://railway.app/button.svg)](https://railway.app/new/template/zN4vrb)
+'''
+git clone url
+cd ./VPN
+sudo ./docker_vpn.sh -p password
+'''
 
 ---
 
