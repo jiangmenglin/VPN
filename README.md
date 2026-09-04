@@ -2,7 +2,7 @@
 ### Based on Shadowsocks with V2-Raу-plugin
 
 ```txt
-git clone url
+git clone https://github.com/jiangmenglin/VPN.git
 cd ./VPN
 sudo ./docker_vpn.sh -p password
 ```
